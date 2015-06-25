@@ -18,6 +18,28 @@ Event.prototype.listen = function(cb) {
   this.cbListeners.push(cb);
 };
 
+Event.prototype.empty = function() {
+  return new Event();
+};
+
+Event.prototype.concat = function(otherE) {
+  var newE = new Event();
+  newE.body = new NoopBody(newE);
+  this.eventListeners.push(newE);
+  otherE.eventListeners.push(newE);
+  return newE;
+};
+
+// Noop
+
+function NoopBody(srcEv) {
+  this.ev = srcEv;
+}
+
+NoopBody.prototype.run = function(v) {
+  this.ev.push(v);
+};
+
 // Map
 
 function MapBody(fn, srcEv) {
