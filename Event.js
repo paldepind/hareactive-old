@@ -2,10 +2,12 @@ function Event() {
   this.cbListeners = [];
   this.eventListeners = [];
   this.body = undefined;
+  this.last = undefined;
 }
 
 Event.prototype.push = function(val) {
   var i;
+  this.last = val;
   for (i = 0; i < this.cbListeners.length; ++i) {
     this.cbListeners[i](val);
   }
@@ -30,6 +32,27 @@ Event.prototype.concat = function(otherE) {
   return newE;
 };
 
+Event.prototype.map = function(fn) {
+  var newE = new Event();
+  newE.body = new MapBody(fn, newE);
+  this.eventListeners.push(newE);
+  return newE;
+};
+
+Event.prototype.ap = function(valE) {
+  var newE = new Event();
+  newE.body = new ApBody(this, valE, newE);
+  this.eventListeners.push(newE);
+  valE.eventListeners.push(newE);
+  return newE;
+};
+
+Event.prototype.of = function(val) {
+  var newE = new Event();
+  newE.last = val;
+  return newE;
+};
+
 // Noop
 
 function NoopBody(srcEv) {
@@ -51,12 +74,20 @@ MapBody.prototype.run = function(v) {
   this.ev.push(this.fn(v));
 };
 
-function map(fn, srcEv) {
-  var mapEv = new Event();
-  mapEv.body = new MapBody(fn, mapEv);
-  srcEv.eventListeners.push(mapEv);
-  return mapEv;
+// Apply
+
+function ApBody(fnE, valE, ev) {
+  this.fnE = fnE;
+  this.valE = valE;
+  this.ev = ev;
 }
+
+ApBody.prototype.run = function(v) {
+  var fn = this.fnE.last, val = this.valE.last;
+  if (fn !== undefined && val !== undefined) {
+    this.ev.push(fn(val));
+  }
+};
 
 // Filter
 
@@ -102,5 +133,11 @@ module.exports = {
   Event: function() { return new Event(); },
   filter: filter,
   scan: scan,
-  map: map,
+  map: function(fn, srcEv) {
+    return srcEv.map(fn);
+  },
+  ap: function(fnE, valE) {
+    return fnE.ap(valE);
+  },
+  of: Event.prototype.of,
 };
