@@ -47,32 +47,40 @@ describe('Behavior', function() {
     assert.equal(B.at(b), 3);
   });
   describe('concat', function() {
-    it('calls listeners with events from both', function() {
-      var result = [];
-      var ev1 = B.Behavior();
-      var ev2 = B.Behavior();
-      var both = ev1.concat(ev2);
-      both.listen(function(v) { result.push(v); });
-      ev1.push(1);
-      ev2.push(2);
-      ev1.push(3);
-      assert.deepEqual(result, [1, 2, 3]);
+    function mAdd(m) {
+      return mNumber(this.n + m.n);
+    }
+    function mNumber(n) {
+      return {n: n, concat: mAdd};
+    }
+    it('appends values from behaviors with push', function() {
+      var nB = B.BehaviorK(mNumber(1));
+      var mB = B.BehaviorK(mNumber(2));
+      var nmB = nB.concat(mB);
+      assert.equal(B.at(nmB).n, 3);
+      nB.push(mNumber(3));
+      assert.equal(B.at(nmB).n, 5);
+      mB.push(mNumber(5));
+      assert.equal(B.at(nmB).n, 8);
     });
-    it('is associative', function() {
-      var result1 = [];
-      var result2 = [];
-      var ev1 = B.Behavior();
-      var ev2 = B.Behavior();
-      var first = ev1.concat(ev2);
-      var second = ev2.concat(ev1);
-      first.listen(function(v) { result1.push(v); });
-      second.listen(function(v) { result2.push(v); });
-      ev1.push(1);
-      ev2.push(2);
-      ev1.push(3);
-      ev2.push(4);
-      assert.deepEqual(result1, [1, 2, 3, 4]);
-      assert.deepEqual(result1, result2);
+    it('appends values from behaviors with pull', function() {
+      var n = 1, m = 3;
+      var nB = B.Behavior(function() {
+        return mNumber(n);
+      });
+      var mB = B.BehaviorK(mNumber(4));
+      var nmB = nB.concat(mB);
+      assert.equal(B.at(nmB).n, 5);
+      n = 2;
+      assert.equal(B.at(nmB).n, 6);
+      B.set(mB, function() {
+        return mNumber(m);
+      });
+      assert.equal(B.at(nmB).n, 5);
+      m = 4;
+      assert.equal(B.at(nmB).n, 6);
+      nB.push(mNumber(0));
+      assert.equal(B.at(nmB).n, 4);
     });
   });
   describe('map', function() {
