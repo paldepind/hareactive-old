@@ -93,29 +93,19 @@ ApBody.prototype.run = function(v) {
   }
 };
 
-function TFun(fn, k) {
-  this.fn = fn;
-  this.k = k;
+ApBody.prototype.pull = function() {
+  return at(this.fnE)(at(this.valE));
+};
+
+function at(b) {
+  return b.last !== undefined ? b.last : b.body.pull();
 }
 
-function K(k) {
-  return new TFun(undefined, k);
-}
-
-function Fun(fn) {
-  return new TFun(fn, undefined);
-}
-
-function Behavior(tFun) {
+function Behavior(fn, k) {
   this.cbListeners = [];
   this.eventListeners = [];
-  if (tFun instanceof TFun) {
-    this.last = undefined;
-    this.body = new PullBody(tFun.fn);
-  } else {
-    this.last = tFun;
-    this.body = new PullBody(undefined);
-  }
+  this.last = k;
+  this.body = new PullBody(fn);
 }
 
 Behavior.prototype.push = Event.prototype.push;
@@ -137,19 +127,20 @@ Behavior.prototype.map = function(fn) {
   return newB;
 };
 
-Behavior.prototype.ap = function(valE) {
-  var newB = new Behavior();
-  newB.body = new ApBody(this, valE, newB);
+Behavior.prototype.ap = function(valB) {
+  var fn = this.last, val = valB.last;
+  var newB = new Behavior(undefined, fn !== undefined && val !== undefined ? fn(val) : undefined);
+  newB.body = new ApBody(this, valB, newB);
   this.eventListeners.push(newB);
-  valE.eventListeners.push(newB);
+  valB.eventListeners.push(newB);
   return newB;
 };
 
 Behavior.prototype.of = function(val) {
-  return new Behavior(val);
+  return new Behavior(undefined, val);
 };
 
-// PullBehavior
+// Pull body
 
 function PullBody(fn) {
   this.fn = fn;
@@ -161,19 +152,18 @@ PullBody.prototype.pull = function() {
 
 module.exports = {
   Behavior: {
-    Behavior: function(v) {
-      return new Behavior(v);
+    Behavior: function(fn) {
+      return new Behavior(fn, undefined);
     },
-    K: K,
-    Fun: Fun,
+    BehaviorK: function(v) {
+      return new Behavior(undefined, v);
+    },
     of: Behavior.prototype.of,
     set: function(b, fn) {
       b.clear();
       b.body.fn = fn;
     },
-    at: function(b) {
-      return b.last !== undefined ? b.last : b.body.pull();
-    },
+    at: at,
   },
   Event: {
     Event: function() { return new Event(); },

@@ -24,7 +24,7 @@ function add(x, y) {
 
 describe('Behavior', function() {
   it('pulls constant function', function() {
-    var b = B.Behavior(0);
+    var b = B.BehaviorK(0);
     assert.equal(B.at(b), 0);
     b.push(1);
     assert.equal(B.at(b), 1);
@@ -35,9 +35,9 @@ describe('Behavior', function() {
   });
   it('pushes from time varying functions', function() {
     var time = 0;
-    var b = B.Behavior(B.Fun(function() {
+    var b = B.Behavior(function() {
       return time;
-    }));
+    });
     assert.equal(B.at(b), 0);
     time = 1;
     assert.equal(B.at(b), 1);
@@ -77,7 +77,7 @@ describe('Behavior', function() {
   });
   describe('map', function() {
     it('maps constant function', function() {
-      var b = B.Behavior(0);
+      var b = B.BehaviorK(0);
       var mapped = B.map(double, b);
       assert.equal(B.at(b), 0);
       B.push(b, 1);
@@ -99,9 +99,9 @@ describe('Behavior', function() {
     });
     it('maps time function', function() {
       var time = 0;
-      var b = B.Behavior(B.Fun(function() {
+      var b = B.Behavior(function() {
         return time;
-      }));
+      });
       var mapped = B.map(double, b);
       assert.equal(B.at(mapped), 0);
       time = 1;
@@ -113,26 +113,46 @@ describe('Behavior', function() {
     });
   });
   describe('ap', function() {
-    it('applies event of functions to event of numbers', function() {
+    it('applies event of functions to event of numbers with push', function() {
       var result = [];
-      var fnE = B.Behavior();
-      var numE = B.Behavior();
-      var applied = E.ap(fnE, numE);
-      applied.listen(function(v) { result.push(v); });
-      fnE.push(add(1));
-      numE.push(2);
-      fnE.push(double);
-      fnE.push(isEven);
-      numE.push(7);
-      fnE.push(double);
-      assert.deepEqual(result, [3, 4, true, false, 14]);
+      var fnB = B.BehaviorK(add(1));
+      var numE = B.BehaviorK(3);
+      var applied = B.ap(fnB, numE);
+      assert.equal(B.at(applied), 4);
+      fnB.push(add(2));
+      assert.equal(B.at(applied), 5);
+      fnB.push(double);
+      assert.equal(B.at(applied), 6);
+      fnB.push(isEven);
+      assert.equal(B.at(applied), false);
+      numE.push(8);
+      assert.equal(B.at(applied), true);
+      fnB.push(double);
+      assert.equal(B.at(applied), 16);
+    });
+    it('applies event of functions to event of numbers with pull', function() {
+      var number = 1;
+      var fnB = B.BehaviorK(add(5));
+      var numE = B.Behavior(function() {
+        return number;
+      });
+      var applied = E.ap(fnB, numE);
+      assert.equal(B.at(applied), 6);
+      fnB.push(add(2));
+      assert.equal(B.at(applied), 3);
+      number = 4;
+      assert.equal(B.at(applied), 6);
+      fnB.push(double);
+      assert.equal(B.at(applied), 8);
+      number = 8;
+      assert.equal(B.at(applied), 16);
     });
   });
   describe('of', function() {
     it('identity', function() {
       var result1 = [];
       var result2 = [];
-      var numB = B.Behavior(0);
+      var numB = B.BehaviorK(0);
       var num2B = B.of(id).ap(numB);
       numB.push(1);
       assert.equal(B.at(numB), 1);
@@ -147,7 +167,7 @@ describe('Behavior', function() {
   });
   it('can switch from constant to varying and back', function() {
     var time = 0;
-    var b = B.Behavior(0);
+    var b = B.BehaviorK(0);
     var mapped = B.map(double, b);
     assert.equal(B.at(mapped), 0);
     B.set(b, function() {
