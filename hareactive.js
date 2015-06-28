@@ -97,7 +97,7 @@ ApBody.prototype.pull = function() {
   return at(this.fnE)(at(this.valE));
 };
 
-// Concat body (monoid) only used by behaviors
+// Concat body – only used by behaviors
 
 function ConcatBody(fstB, sndB, b) {
   this.fstB = fstB;
@@ -116,15 +116,15 @@ ConcatBody.prototype.pull = function() {
   return at(this.fstB).concat(at(this.sndB));
 };
 
-function at(b) {
-  return b.last !== undefined ? b.last : b.body.pull();
-}
-
 function Behavior(fn, k) {
   this.cbListeners = [];
   this.eventListeners = [];
   this.last = k;
   this.body = new PullBody(fn);
+}
+
+function at(b) {
+  return b.last !== undefined ? b.last : b.body.pull();
 }
 
 Behavior.prototype.push = Event.prototype.push;

@@ -1,4 +1,4 @@
-var hare = require('./hareactive.js');
+var hare = require('../hareactive.js');
 var E = hare.Event;
 var Event = E.Event;
 

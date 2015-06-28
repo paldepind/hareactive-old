@@ -1,7 +1,7 @@
 var assert = require('assert');
 
-var E = require('../Event.js');
-var B = require('../Behavior.js');
+var E = require('../event');
+var B = require('../behavior');
 
 function id(v) {
   return v;

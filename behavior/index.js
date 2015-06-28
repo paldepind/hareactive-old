@@ -1,4 +1,4 @@
-var hare = require('./hareactive.js');
+var hare = require('../hareactive.js');
 var B = hare.Behavior;
 
 B.map = function(fn, b) {
