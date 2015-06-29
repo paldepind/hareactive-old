@@ -31,6 +31,15 @@ describe('Event', function() {
     ev.push(3);
     assert.deepEqual(result, [1, 2, 3]);
   });
+  it('has curried push function', function() {
+    var e = E.Event();
+    e.push(1);
+    assert.equal(E.last(e), 1);
+    E.push(e, 2);
+    assert.equal(E.last(e), 2);
+    E.push(e)(3);
+    assert.equal(E.last(e), 3);
+  });
   describe('concat', function() {
     it('calls listeners with events from both', function() {
       var result = [];

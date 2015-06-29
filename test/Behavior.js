@@ -193,6 +193,12 @@ describe('Behavior', function() {
     B.push(b, 4);
     assert.equal(B.at(mapped), 8);
   });
+  describe('scan', function() {
+    it('begins with initial value', function() {
+      var e = E.scan(function() {}, 0, E.Event());
+      assert.equal(E.last(e), 0);
+    });
+  });
   describe('stepper', function() {
     it('steps to the last event value', function() {
       var e = E.Event();

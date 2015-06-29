@@ -184,6 +184,11 @@ PullBody.prototype.pull = function() {
   return this.fn();
 };
 
+function pushFn(targ, v) {
+  return arguments.length === 1 ? function(v) { targ.push(v); }
+                                : targ.push(v);
+}
+
 module.exports = {
   Behavior: {
     Behavior: function(fn) {
@@ -202,8 +207,9 @@ module.exports = {
   Event: {
     Event: function() { return new Event(); },
     of: Event.prototype.of,
-    push: function(e, val) {
-      e.push(val);
-    },
+    push: pushFn,
+    last: function(e) {
+      return e.last;
+    }
   },
 };

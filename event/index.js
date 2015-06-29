@@ -22,25 +22,7 @@ E.filter = function(pred, srcEv) {
   return filterEv;
 };
 
-// Scan
-
-function ScanBody(fn, acc, ev) {
-  this.fn = fn;
-  this.acc = acc;
-  this.ev = ev;
-}
-
-ScanBody.prototype.run = function(v) {
-  this.acc = this.fn(this.acc, v);
-  this.ev.push(this.acc);
-};
-
-E.scan = function(fn, acc, srcEv) {
-  var scanEv = new Event();
-  scanEv.body = new ScanBody(fn, acc, scanEv);
-  srcEv.eventListeners.push(scanEv);
-  return scanEv;
-};
+E.scan = require('./scan.js');
 
 E.map = function(fn, srcEv) {
   return srcEv.map(fn);
