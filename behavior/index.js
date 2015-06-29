@@ -13,4 +13,6 @@ B.ap = function(fnB, valB) {
   return fnB.ap(valB);
 };
 
+B.stepper = require('./stepper.js');
+
 module.exports = B;

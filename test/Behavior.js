@@ -193,4 +193,15 @@ describe('Behavior', function() {
     B.push(b, 4);
     assert.equal(B.at(mapped), 8);
   });
+  describe('stepper', function() {
+    it('steps to the last event value', function() {
+      var e = E.Event();
+      var b = B.stepper(0, e);
+      assert.equal(B.at(b), 0);
+      e.push(1);
+      assert.equal(B.at(b), 1);
+      e.push(2);
+      assert.equal(B.at(b), 2);
+    });
+  });
 });
