@@ -1,6 +1,6 @@
 var assert = require('assert');
 
-var E = require('../Event.js');
+var E = require('../event');
 
 function id(v) {
   return v;

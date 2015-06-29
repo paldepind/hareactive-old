@@ -155,6 +155,12 @@ describe('Behavior', function() {
       number = 8;
       assert.equal(B.at(applied), 16);
     });
+    it('automatically lift constants', function() {
+      var result = [];
+      var fnB = B.BehaviorK(add(1));
+      var applied = B.ap(fnB, 3);
+      assert.equal(B.at(applied), 4);
+    });
   });
   describe('of', function() {
     it('identity', function() {

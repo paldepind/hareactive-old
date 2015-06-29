@@ -120,7 +120,7 @@ function Behavior(fn, k) {
   this.cbListeners = [];
   this.eventListeners = [];
   this.last = k;
-  this.body = new PullBody(fn);
+  this.body = new PullBody(this, fn);
 }
 
 function at(b) {
@@ -147,6 +147,7 @@ Behavior.prototype.map = function(fn) {
 };
 
 Behavior.prototype.ap = function(valB) {
+  if (!(valB instanceof Behavior)) valB = new Behavior(undefined, valB);
   var fn = this.last, val = valB.last;
   var newB = new Behavior(undefined, fn !== undefined && val !== undefined ? fn(val) : undefined);
   newB.body = new ApBody(this, valB, newB);
@@ -170,9 +171,14 @@ Behavior.prototype.concat = function(b) {
 
 // Pull body
 
-function PullBody(fn) {
+function PullBody(b, fn) {
+  this.b = b;
   this.fn = fn;
 }
+
+PullBody.prototype.run = function(v) {
+  this.b.push(v);
+};
 
 PullBody.prototype.pull = function() {
   return this.fn();
@@ -196,5 +202,8 @@ module.exports = {
   Event: {
     Event: function() { return new Event(); },
     of: Event.prototype.of,
+    push: function(e, val) {
+      e.push(val);
+    },
   },
 };
