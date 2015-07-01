@@ -122,6 +122,26 @@ describe('Event', function() {
       assert.deepEqual(result1, result2);
     });
   });
+  describe('chain', function() {
+    it('resulting event emits from all', function() {
+      var result = [];
+      var e1 = E.Event();
+      var e2 = E.Event();
+      var e3 = E.Event();
+      var chainedE = e1.chain(function(n) {
+        return n === 2 ? e2 : e3;
+      });
+      E.map(function(n) {
+        result.push(n);
+      }, chainedE);
+      E.push(e1, 2);
+      E.push(e1, 3);
+      E.push(e2, 1);
+      E.push(e3, 2);
+      E.push(e2, 3);
+      assert.deepEqual(result, [1, 2, 3]);
+    });
+  });
   it('filters values', function() {
     var result = [];
     var ev = E.Event();

@@ -52,6 +52,15 @@ Event.prototype.of = function(val) {
   return newE;
 };
 
+Event.prototype.chain = function(fn) {
+  var outE = new Event();
+  outE.body = new NoopBody(outE);
+  var recieveE = new Event();
+  recieveE.body = new ChainBody(this, fn, outE);
+  this.eventListeners.push(recieveE);
+  return outE;
+};
+
 // Noop body
 
 function NoopBody(srcEv) {
@@ -95,6 +104,19 @@ ApBody.prototype.run = function(v) {
 
 ApBody.prototype.pull = function() {
   return at(this.fnE)(at(this.valE));
+};
+
+// Chain body
+
+function ChainBody(srcE, fn, e) {
+  this.srcE = srcE;
+  this.fn = fn;
+  this.e = e;
+}
+
+ChainBody.prototype.run = function(v) {
+  var newE = this.fn(v);
+  newE.eventListeners.push(this.e);
 };
 
 // Concat body – only used by behaviors
@@ -189,6 +211,10 @@ function pushFn(targ, v) {
                                 : targ.push(v);
 }
 
+function mapFn(fn, e) {
+  return e.map(fn);
+}
+
 module.exports = {
   Behavior: {
     Behavior: function(fn) {
@@ -203,6 +229,7 @@ module.exports = {
       b.body.fn = fn;
     },
     at: at,
+    map: mapFn,
   },
   Event: {
     Event: function() { return new Event(); },
@@ -210,6 +237,7 @@ module.exports = {
     push: pushFn,
     last: function(e) {
       return e.last;
-    }
+    },
+    map: mapFn,
   },
 };
