@@ -46,6 +46,15 @@ describe('Behavior', function() {
     time = 3;
     assert.equal(B.at(b), 3);
   });
+  it('allows listening on discretely changes', function() {
+    var b = B.BehaviorK(0);
+    var result = [];
+    B.on(function(v) { result.push(v); }, b);
+    b.push(1);
+    b.push(2);
+    b.push(3);
+    assert.deepEqual(result, [0,1,2,3]);
+  });
   describe('concat', function() {
     function mAdd(m) {
       return mNumber(this.n + m.n);

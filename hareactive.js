@@ -15,10 +15,6 @@ Event.prototype.push = function(val) {
   }
 };
 
-Event.prototype.listen = function(cb) {
-  this.cbListeners.push(cb);
-};
-
 Event.prototype.empty = function() {
   return new Event();
 };
@@ -150,7 +146,6 @@ function at(b) {
 }
 
 Behavior.prototype.push = Event.prototype.push;
-Behavior.prototype.listen = Event.prototype.listen;
 
 Behavior.prototype.clear = function() {
   if (this.last !== undefined) {
@@ -215,6 +210,10 @@ function mapFn(fn, e) {
   return e.map(fn);
 }
 
+function on(f, e) {
+  e.cbListeners.push(f)
+}
+
 module.exports = {
   Behavior: {
     Behavior: function(fn) {
@@ -230,6 +229,11 @@ module.exports = {
     },
     at: at,
     map: mapFn,
+    on: function(f, b) {
+      b.cbListeners.push(f);
+      f(at(b));
+    },
+    push: pushFn,
   },
   Event: {
     Event: function() { return new Event(); },
@@ -239,5 +243,6 @@ module.exports = {
       return e.last;
     },
     map: mapFn,
+    on: on,
   },
 };

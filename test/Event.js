@@ -24,11 +24,11 @@ function add(x, y) {
 describe('Event', function() {
   it('calls listeners', function() {
     var result = [];
-    var ev = E.Event();
-    ev.listen(function(v) { result.push(v); });
-    ev.push(1);
-    ev.push(2);
-    ev.push(3);
+    var e = E.Event();
+    E.on(function(v) { result.push(v); }, e);
+    e.push(1);
+    e.push(2);
+    e.push(3);
     assert.deepEqual(result, [1, 2, 3]);
   });
   it('has curried push function', function() {
@@ -46,7 +46,7 @@ describe('Event', function() {
       var ev1 = E.Event();
       var ev2 = E.Event();
       var both = ev1.concat(ev2);
-      both.listen(function(v) { result.push(v); });
+      E.on(function(v) { result.push(v); }, both);
       ev1.push(1);
       ev2.push(2);
       ev1.push(3);
@@ -59,8 +59,8 @@ describe('Event', function() {
       var ev2 = E.Event();
       var first = ev1.concat(ev2);
       var second = ev2.concat(ev1);
-      first.listen(function(v) { result1.push(v); });
-      second.listen(function(v) { result2.push(v); });
+      E.on(function(v) { result1.push(v); }, first);
+      E.on(function(v) { result2.push(v); }, second);
       ev1.push(1);
       ev2.push(2);
       ev1.push(3);
@@ -74,7 +74,7 @@ describe('Event', function() {
       var result = [];
       var ev = E.Event();
       var mapped = E.map(double, ev);
-      mapped.listen(function(v) { result.push(v); });
+      E.on(function(v) { result.push(v); }, mapped);
       ev.push(1);
       ev.push(2);
       ev.push(3);
@@ -84,7 +84,7 @@ describe('Event', function() {
       var result = [];
       var ev = E.Event();
       var mapped = ev.map(double);
-      mapped.listen(function(v) { result.push(v); });
+      E.on(function(v) { result.push(v); }, mapped);
       ev.push(1);
       ev.push(2);
       ev.push(3);
@@ -97,7 +97,7 @@ describe('Event', function() {
       var fnE = E.Event();
       var numE = E.Event();
       var applied = E.ap(fnE, numE);
-      applied.listen(function(v) { result.push(v); });
+      E.on(function(v) { result.push(v); }, applied);
       fnE.push(add(1));
       numE.push(2);
       fnE.push(double);
@@ -113,8 +113,8 @@ describe('Event', function() {
       var result2 = [];
       var numE = E.Event();
       var num2E = E.of(id).ap(numE);
-      numE.listen(function(v) { result1.push(v); });
-      num2E.listen(function(v) { result2.push(v); });
+      E.on(function(v) { result1.push(v); }, numE);
+      E.on(function(v) { result2.push(v); }, numE);
       numE.push(1);
       numE.push(2);
       numE.push(3);
@@ -146,7 +146,7 @@ describe('Event', function() {
     var result = [];
     var ev = E.Event();
     var filtered = E.filter(isEven, ev);
-    filtered.listen(function(v) { result.push(v); });
+    E.on(function(v) { result.push(v); }, filtered);
     ev.push(1);
     ev.push(2);
     ev.push(3);
@@ -156,7 +156,7 @@ describe('Event', function() {
     var result = [];
     var ev = E.Event();
     var scanned = E.scan(add, 0, ev);
-    scanned.listen(function(v) { result.push(v); });
+    E.on(function(v) { result.push(v); }, scanned);
     ev.push(1);
     ev.push(2);
     ev.push(3);
